@@ -1,21 +1,48 @@
 import imutils
 import cv2 
-from extractPixels import extract_pixels
+import numpy as np
+from objectDetection import *
+
+def changeToPerspective(image,points):
+	# points)
+	pts1 = np.float32([points[0],points[3],points[1],points[2]])
+	pts2 = np.float32([[0,0],[1024,0],[0,768],[1024,768]])
+	M = cv2.getPerspectiveTransform(pts1,pts2)
+	new_img = cv2.warpPerspective(small,M,(1024,768))
+	return new_img
+
 image = cv2.imread('images/passportFromPhone.jpg')
-rotated = imutils.rotate_bound(image,270)
-small = cv2.resize(rotated, (1150, 850))  
 
-edged = cv2.Canny(small, 10, 200)
+h,w,_ = image.shape
 
-(_,cnts, _) = cv2.findContours(edged.copy(), cv2.RETR_CCOMP  , cv2.CHAIN_APPROX_TC89_L1  )
-ind = 0
+if h > w:
+	rotated = imutils.rotate_bound(image,270)
+else:
+	rotated = image
 
-for c in cnts:
-	x,y,w,h = cv2.boundingRect(c)
-	if w>300 and h>200:
-		ind += 1
-		new_img = small[y:y+h,x:x+w]		
-		new_img = extract_pixels(new_img)
-		cv2.imwrite("images/passport" + '.jpg', new_img)
+small = cv2.resize(rotated, (1024, 768))
+
+
+typeOfPassport = "buletinBack"
+points,_ = objectDetection(small,initObjDetection(cv2.imread("images/buletinBackTemplate.jpg")))
+
+'''
+if len(points) <= 0:
+	points,_ = objectDetection(small,initObjDetection(cv2.imread("images/buletinFaceTemplate.jpg")))
+	typeOfPassport = "buletinBack"
+	if len(points) <= 0 :
+		points,_ = objectDetection(small,initObjDetection(cv2.imread("images/passportDocument.jpg")))
+		typeOfPassport = "buletinBack"
+		if len(points) <= 0:
+			print("NO PASSPORT OR BULETIN ON PHOTO")
+'''
+			
+small = changeToPerspective(small,points)
+
+# Get rid of pdf417 code
+small[0 : int(768 / 3) , int(1024 / 2.2) : 1024] = 0
+# new_img[int(h * 2 / 3) : h , 0 : w] = 0
+
+cv2.imwrite("images/passport" + '.jpg', small)
 
 		

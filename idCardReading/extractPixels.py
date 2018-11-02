@@ -27,17 +27,24 @@ def setBrightness(image,toBrightness):
 
    return image
 
-def extract_pixels(image,brightness = 0.7):
+def extract_pixels(image,brightness = 0.6):
 
-      # image = cv2.resize(image, (1024,768))
-    image = setBrightness(image,brightness)
+#     image = setBrightness(image,brightness)
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     
 
     lower = np.array([0,0,0])  #-- Lower range --
-    upper = np.array([115,255,165])  #-- Upper range --
+    upper = np.array([255,255,130])  #-- Upper range --
     
     mask = cv2.inRange(hsv, lower, upper)
+    res = cv2.bitwise_and(image, image, mask=mask)
 
     return mask
 
+# image = cv2.imread("images/passport.jpg")
+
+# new_img = extract_pixels(image)
+
+# cv2.imshow("dsadas",new_img)
+# cv2.waitKey(0)
+# cv2.imwrite("extractedPixels.jpg",new_img)

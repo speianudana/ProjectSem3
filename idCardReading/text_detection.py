@@ -59,7 +59,7 @@ def combine_all_rect(boxes):
 	return combinedBoxes, foundIntersection
 
 
-def findTextLabels(image,neuralNetworkData = "frozen_east_text_detection.pb",minConfidence = 0.99,width = 352, height = 320):
+def findTextLabels(image,neuralNetworkData = "frozen_east_text_detection.pb",minConfidence = 0.95,width = 448, height = 384):
 	
 	orig = image.copy()
 	(H, W) = image.shape[:2]
@@ -175,7 +175,7 @@ def findTextLabels(image,neuralNetworkData = "frozen_east_text_detection.pb",min
 		if(not foundIntersection):
 			break
 
-
+	# for debuging
 	for (startX, startY, endX, endY) in combinedBoxes:
 		# scale the bounding box coordinates based on the respective
 		cv2.rectangle(orig, (startX, startY), (endX, endY), (0, 255, 0), 2)
@@ -187,7 +187,7 @@ def findTextLabels(image,neuralNetworkData = "frozen_east_text_detection.pb",min
 
 	return combinedBoxes
 
-image = cv2.imread("images/passport1.jpg")
+# image = cv2.imread("images/passport1.jpg")
 
 # labels = findTextLabels(image)
 
